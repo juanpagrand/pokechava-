@@ -8,6 +8,7 @@ import '../widgets/pokemon_type_filter.dart';
 import '../widgets/skeleton_loader.dart';
 import 'favorites_screen.dart';
 import 'pokemon_detail_screen.dart';
+import 'charts_gallery_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -107,6 +108,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                 ],
+              );
+            },
+          ),
+
+          // Charts Gallery Button
+          IconButton(
+            tooltip: 'Ver 40 Gráficos',
+            icon: const Icon(Icons.bar_chart_rounded),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ChartsGalleryScreen(),
+                ),
               );
             },
           ),
