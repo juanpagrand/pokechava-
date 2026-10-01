@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/charts/charts.dart';
+import '../widgets/charts_syncfusion/syncfusion_charts_view.dart';
 
 class ChartsGalleryScreen extends StatelessWidget {
   const ChartsGalleryScreen({super.key});
@@ -7,24 +8,26 @@ class ChartsGalleryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 5,
+      length: 6,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Galería de 40 Gráficos (fl_chart)'),
+          title: const Text('Galería de Gráficos'),
           bottom: const TabBar(
             isScrollable: true,
             tabs: [
-              Tab(icon: Icon(Icons.bar_chart), text: 'Barras (10)'),
-              Tab(icon: Icon(Icons.show_chart), text: 'Líneas (10)'),
-              Tab(icon: Icon(Icons.pie_chart), text: 'Pastel / Dona (10)'),
-              Tab(icon: Icon(Icons.radar), text: 'Radar (5)'),
-              Tab(icon: Icon(Icons.scatter_plot), text: 'Dispersión (5)'),
+              Tab(icon: Icon(Icons.auto_graph_rounded), text: 'graficas hechas con synfusion'),
+              Tab(icon: Icon(Icons.bar_chart), text: 'Barras fl_chart (10)'),
+              Tab(icon: Icon(Icons.show_chart), text: 'Líneas fl_chart (10)'),
+              Tab(icon: Icon(Icons.pie_chart), text: 'Pastel fl_chart (10)'),
+              Tab(icon: Icon(Icons.radar), text: 'Radar fl_chart (5)'),
+              Tab(icon: Icon(Icons.scatter_plot), text: 'Dispersión fl_chart (5)'),
             ],
           ),
         ),
         body: const TabBarView(
           children: [
-            // Tab 1: Barras (1 a 10)
+            // Tab 1: 40 Gráficas hechas con Syncfusion
+            SyncfusionChartsView(),
             _ChartsListView(
               charts: [
                 BarChartWidget01(),
