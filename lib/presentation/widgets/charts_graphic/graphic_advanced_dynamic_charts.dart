@@ -1,29 +1,4 @@
-// ===========================================================================
-// graphic_advanced_dynamic_charts.dart — AVANZADOS A09–A15 (DINÁMICOS)
-// ===========================================================================
-// Qué contiene: gráficos cuyos datos o especificación cambian en vivo.
-//   A09 reordenar con animación (tag + Transition + entrance) ·
-//   A10 cambiar el sistema de coordenadas · A11 cambiar la marca ·
-//   A12 radar con selector de Pokémon · A13 datos en tiempo real (Timer) ·
-//   A14 filtrar por tipo con chips · A15 absoluto vs. 100 % (Proportion
-//   con nest).
-// Todos son StatefulWidget: guardan una elección del usuario (o un Timer)
-// y llaman a setState; al reconstruirse, Chart compara la especificación
-// nueva con la vieja y redibuja (con animación si hay `transition`).
-// Se asume todo lo de N01–N40 y A01–A08.
-//
-// Imports:
-//   - dart:async → Timer (A13).
-//   - dart:math (como math) → Random con semilla (A13).
-//   - flutter/material.dart → ChoiceChip, FilterChip, DropdownButton,
-//     FilledButton, Curves, etc.
-//   - graphic/graphic.dart  → Chart, Transition, MarkEntrance, Coord,
-//     Mark, LineAnnotation, Proportion…
-//   - graphic_chart_card.dart / graphic_data.dart → tarjeta y datos/atajos.
-//
-// Quién lo importa: el barril charts_graphic.dart lo reexporta y
-// graphic_charts_view.dart lo usa en la categoría "Dinámicos".
-// ===========================================================================
+// Gráficos avanzados A09–A15: cambian en vivo (setState, Timer, animación).
 
 import 'dart:async';
 import 'dart:math' as math;
@@ -34,12 +9,7 @@ import 'package:graphic/graphic.dart';
 import 'graphic_chart_card.dart';
 import 'graphic_data.dart';
 
-// Gráficos avanzados A09–A15: datos y especificación que cambian en vivo.
-
 /// Botones compactos tipo "chips" de selección única.
-// Widget auxiliar privado y GENÉRICO (<T>): sirve para opciones String
-// (A09, A10, A11) y bool (A15). Recibe las opciones, la elegida, cómo
-// mostrar cada una (`label`) y qué hacer al elegir (`onSelected`).
 class _Choice<T> extends StatelessWidget {
   final List<T> options;
   final T selected;
@@ -55,7 +25,6 @@ class _Choice<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Wrap: si no caben en una fila, los chips bajan a la siguiente.
     return Wrap(
       spacing: 6,
       runSpacing: 6,
@@ -82,13 +51,11 @@ class GraphicAdvanced09 extends StatefulWidget {
 
 class _GraphicAdvanced09State extends State<GraphicAdvanced09> {
   static const _orders = ['Pokédex', 'Mayor ataque', 'Menor ataque', 'Al azar'];
-  // Estado: el orden elegido y la lista ya ordenada.
   String _order = _orders.first;
   List<Poke> _data = kPokes.take(10).toList();
 
-  // Ordena una COPIA de la lista y la guarda con setState. Una lista nueva
-  // (otra instancia) hace que Chart detecte el cambio de datos.
   void _sort(String order) {
+    // copia nueva para que el Chart note el cambio
     final next = [..._data];
     switch (order) {
       case 'Pokédex':
@@ -112,7 +79,6 @@ class _GraphicAdvanced09State extends State<GraphicAdvanced09> {
       code: 'A09',
       title: 'Reordenar con animación',
       description: 'tag + Transition: cada barra viaja a su nueva posición.',
-      // Los chips van en `controls` (encima del gráfico).
       controls: _Choice<String>(
         options: _orders,
         selected: _order,
@@ -123,26 +89,18 @@ class _GraphicAdvanced09State extends State<GraphicAdvanced09> {
         data: _data,
         variables: {
           'name': pokeName(),
-          // Escala fija 0–140: el eje no depende de los datos y queda
-          // quieto mientras las barras se mueven.
+          // escala fija para que el eje no se mueva
           'attack': pokeNum((p) => p.attack, scale: LinearScale(min: 0, max: 140)),
         },
         marks: [
           IntervalMark(
             color: ColorEncode(value: Colors.redAccent),
-            // Lo nuevo aquí: Transition = animación entre el dibujo viejo y
-            // el nuevo cuando cambian los datos (700 ms, suave al empezar
-            // y al terminar).
+            // animación al cambiar los datos
             transition: Transition(
                 duration: const Duration(milliseconds: 700),
                 curve: Curves.easeInOut),
-            // entrance: cómo aparecen la PRIMERA vez. MarkEntrance.y →
-            // empiezan con altura 0 y crecen hacia arriba.
             entrance: {MarkEntrance.y},
-            // tag: una "identidad" por barra (el nombre). graphic anima
-            // entre elementos con el MISMO tag; así la barra de Mewtwo viaja
-            // a su nuevo lugar. Sin tag empareja por posición en la lista y
-            // las barras solo cambiarían de altura en su sitio.
+            // tag para que cada barra viaje a su nuevo lugar
             tag: (t) => t['name'] as String,
           ),
         ],
@@ -164,9 +122,6 @@ class _GraphicAdvanced10State extends State<GraphicAdvanced10> {
   static const _modes = ['Columnas', 'Barras', 'Rosa', 'Radial'];
   String _mode = _modes.first;
 
-  // Lo nuevo aquí: el `coord` se elige con un switch (expresión de Dart 3)
-  // según el modo. Coord es la clase base de RectCoord y PolarCoord.
-  // Cada caso ya se vio: N02 (barras), N31 (rosa), N32 (radial), N01.
   Coord get _coord => switch (_mode) {
         'Barras' => RectCoord(transposed: true),
         'Rosa' => PolarCoord(startRadius: 0.1),
@@ -176,7 +131,6 @@ class _GraphicAdvanced10State extends State<GraphicAdvanced10> {
 
   @override
   Widget build(BuildContext context) {
-    // En polar no sirven los ejes X/Y rectangulares.
     final polar = _mode == 'Rosa' || _mode == 'Radial';
     return GraphicChartCard(
       code: 'A10',
@@ -197,14 +151,11 @@ class _GraphicAdvanced10State extends State<GraphicAdvanced10> {
         },
         marks: [
           IntervalMark(
-            // Defaults.colors10: paleta de 10 colores que trae graphic.
             color: ColorEncode(variable: 'type', values: Defaults.colors10),
             transition: Transition(duration: const Duration(milliseconds: 500)),
           ),
         ],
-        // Lo único que cambia entre modos. Es la idea central de la
-        // Gramática de Gráficos: el mismo dato y la misma marca dan
-        // columnas, barras, rosa o barras radiales según la coordenada.
+        // solo cambia coord
         coord: _coord,
         axes: polar ? [Defaults.circularAxis] : rectAxes(xRotation: -0.4),
       ),
@@ -224,8 +175,6 @@ class _GraphicAdvanced11State extends State<GraphicAdvanced11> {
   static const _marks = ['IntervalMark', 'LineMark', 'AreaMark', 'PointMark'];
   String _mark = _marks.first;
 
-  // Lo nuevo aquí: la MARCA se elige con un switch. Mark es la clase base
-  // de IntervalMark, LineMark, AreaMark y PointMark.
   Mark get _current {
     final color = ColorEncode(value: Colors.indigo);
     return switch (_mark) {
@@ -248,7 +197,6 @@ class _GraphicAdvanced11State extends State<GraphicAdvanced11> {
       controls: _Choice<String>(
         options: _marks,
         selected: _mark,
-        // En el chip se muestra 'Interval', 'Line'… (sin la palabra Mark).
         label: (o) => o.replaceAll('Mark', ''),
         onSelected: (m) => setState(() => _mark = m),
       ),
@@ -257,14 +205,11 @@ class _GraphicAdvanced11State extends State<GraphicAdvanced11> {
         variables: {
           'name': Variable<Poke, String>(
             accessor: (Poke p) => p.name,
-            // inflate solo para línea/área/puntos (de borde a borde, como
-            // _byDex en N09). Para barras no: necesitan medio hueco a cada
-            // lado o la primera y la última quedarían cortadas por el borde.
+            // inflate solo si no son barras
             scale: OrdinalScale(inflate: _mark != 'IntervalMark'),
           ),
           'speed': pokeNum((p) => p.speed, scale: LinearScale(min: 0)),
         },
-        // Una lista con la marca elegida.
         marks: [_current],
         axes: rectAxes(xRotation: -0.6),
       ),
@@ -281,12 +226,9 @@ class GraphicAdvanced12 extends StatefulWidget {
 }
 
 class _GraphicAdvanced12State extends State<GraphicAdvanced12> {
-  // Los dos Pokémon elegidos.
   String _a = 'Pikachu';
   String _b = 'Snorlax';
 
-  // Lista desplegable con los 23 nombres; la línea inferior lleva el color
-  // de su radar para saber qué selector controla qué figura.
   Widget _picker(String value, Color color, ValueChanged<String> onChanged) {
     return DropdownButton<String>(
       value: value,
@@ -315,10 +257,7 @@ class _GraphicAdvanced12State extends State<GraphicAdvanced12> {
         ],
       ),
       chart: Chart(
-        // Lo nuevo aquí: a cada fila se le agrega 'slot' = 'A' o 'B' según
-        // el selector. Se agrupa por slot y no por nombre para que el
-        // color quede atado al selector (ámbar = A, índigo = B) y la
-        // transición anime "la figura A" aunque cambie el Pokémon.
+        // slot A/B para que el color siga al selector
         data: statsLong(pokesByName([_a, _b]))
             .map((r) => {...r, 'slot': r['name'] == _a ? 'A' : 'B'})
             .toList(),
@@ -327,7 +266,6 @@ class _GraphicAdvanced12State extends State<GraphicAdvanced12> {
           'value': numVar('value', scale: LinearScale(min: 0, max: 160)),
           'slot': strVar('slot'),
         },
-        // Radar de N36 (área + línea con loop), con dos grupos como N37.
         marks: [
           AreaMark(
             position: Varset('stat') * Varset('value') / Varset('slot'),
@@ -336,7 +274,6 @@ class _GraphicAdvanced12State extends State<GraphicAdvanced12> {
               Colors.amber.withValues(alpha: 0.35),
               Colors.indigo.withValues(alpha: 0.3),
             ]),
-            // Al cambiar de Pokémon, el polígono se deforma animado.
             transition: Transition(duration: const Duration(milliseconds: 600)),
           ),
           LineMark(
@@ -363,17 +300,13 @@ class GraphicAdvanced13 extends StatefulWidget {
 }
 
 class _GraphicAdvanced13State extends State<GraphicAdvanced13> {
-  // Random con semilla fija (25): la "batalla" es siempre la misma.
+  // semilla fija
   final _random = math.Random(25);
-  // Puntos visibles (máximo 30, como una ventana que se desliza).
   final List<Datum> _points = [];
-  // El temporizador; `?` porque puede no existir (pausado).
   Timer? _timer;
   int _tick = 0;
   int _hp = 160;
 
-  // initState se ejecuta una sola vez al crear el estado: genera 20
-  // puntos iniciales (para no arrancar con el gráfico vacío) y arranca.
   @override
   void initState() {
     super.initState();
@@ -383,31 +316,22 @@ class _GraphicAdvanced13State extends State<GraphicAdvanced13> {
     _start();
   }
 
-  // Un paso de la simulación: avanza el turno, baja HP al azar (0–17),
-  // cura 45 cada 9 turnos, lo limita a 0..160 y si llega a 0 revive.
   void _step() {
     _tick++;
-    // Snorlax pierde HP con cada golpe y se cura de vez en cuando.
     _hp = (_hp - _random.nextInt(18) + (_tick % 9 == 0 ? 45 : 0)).clamp(0, 160);
     if (_hp == 0) _hp = 160;
     _points.add({'t': _tick, 'hp': _hp});
-    // Ventana deslizante: se borra el punto más viejo.
     if (_points.length > 30) _points.removeAt(0);
   }
 
-  // Lo nuevo aquí: Timer.periodic ejecuta la función cada 800 ms.
-  // `mounted` es true mientras el widget sigue en pantalla: así nunca se
-  // llama setState sobre un widget que ya se quitó (sería un error).
-  // setState(_step) = ejecuta _step y redibuja.
   void _start() {
+    // mounted para no hacer setState si ya se quitó
     _timer = Timer.periodic(const Duration(milliseconds: 800), (_) {
       if (mounted) setState(_step);
     });
   }
 
-  // Al salir de pantalla se CANCELA el Timer. Si no, seguiría corriendo
-  // para siempre en segundo plano (fuga de memoria). El test también
-  // depende de esto: desmonta el widget para que no queden timers vivos.
+  // cancelar el timer al salir, si no sigue corriendo
   @override
   void dispose() {
     _timer?.cancel();
@@ -416,7 +340,6 @@ class _GraphicAdvanced13State extends State<GraphicAdvanced13> {
 
   @override
   Widget build(BuildContext context) {
-    // ¿Está corriendo? (decide el ícono y texto del botón).
     final running = _timer?.isActive ?? false;
     return GraphicChartCard(
       code: 'A13',
@@ -424,7 +347,6 @@ class _GraphicAdvanced13State extends State<GraphicAdvanced13> {
       description: 'Timer + setState: entra un punto nuevo cada 0,8 s (simulado).',
       controls: Row(
         children: [
-          // Botón Pausar/Reanudar: cancela el Timer o crea uno nuevo.
           FilledButton.tonalIcon(
             onPressed: () => setState(() {
               if (running) {
@@ -442,17 +364,12 @@ class _GraphicAdvanced13State extends State<GraphicAdvanced13> {
         ],
       ),
       chart: Chart(
-        // Por qué [..._points] (una copia) y no _points: la lista se
-        // modifica "en el lugar" (add/removeAt), así que sigue siendo la
-        // misma instancia. Chart solo recalcula los datos cuando recibe
-        // OTRA instancia; la copia nueva en cada build fuerza el redibujo.
+        // copia: la lista se modifica en el lugar
         data: [..._points],
         variables: {
           't': numVar('t'),
-          // Escala fija 0–160 para que el eje no salte con cada punto.
           'hp': numVar('hp', scale: LinearScale(min: 0, max: 160)),
         },
-        // Área con degradado (N21) + línea encima (N20).
         marks: [
           AreaMark(
             gradient: GradientEncode(
@@ -468,9 +385,7 @@ class _GraphicAdvanced13State extends State<GraphicAdvanced13> {
           ),
           LineMark(color: ColorEncode(value: Colors.green.shade700)),
         ],
-        // Lo nuevo aquí: `annotations`. LineAnnotation dibuja una línea
-        // fija en un valor de datos: aquí HP = 40 (zona de peligro), roja
-        // y punteada. dim: Dim.y → línea horizontal a esa altura.
+        // línea de peligro en HP 40
         annotations: [
           LineAnnotation(
             dim: Dim.y,
@@ -479,7 +394,6 @@ class _GraphicAdvanced13State extends State<GraphicAdvanced13> {
             style: PaintStyle(strokeColor: Colors.red, dash: [5, 4]),
           ),
         ],
-        // Solo eje Y: los números de turno no aportan.
         axes: [yAxis()],
       ),
     );
@@ -495,12 +409,10 @@ class GraphicAdvanced14 extends StatefulWidget {
 }
 
 class _GraphicAdvanced14State extends State<GraphicAdvanced14> {
-  // Tipos marcados (un Set: sin repetidos). Empieza con los iniciales.
   final Set<String> _types = {'Planta', 'Fuego', 'Agua'};
 
   @override
   Widget build(BuildContext context) {
-    // Los datos se filtran en Dart antes de pasarlos al gráfico.
     final data = kPokes.where((p) => _types.contains(p.type)).toList();
     return GraphicChartCard(
       code: 'A14',
@@ -511,7 +423,6 @@ class _GraphicAdvanced14State extends State<GraphicAdvanced14> {
         spacing: 6,
         runSpacing: 6,
         children: [
-          // FilterChip (multiselección, a diferencia de ChoiceChip).
           for (final t in kTypeColors.keys)
             FilterChip(
               label: Text(t, style: const TextStyle(fontSize: 11)),
@@ -524,9 +435,7 @@ class _GraphicAdvanced14State extends State<GraphicAdvanced14> {
             ),
         ],
       ),
-      // Si no queda ningún tipo, se muestra un texto en vez del Chart:
-      // así no se le pasa a graphic una lista vacía (sin datos no hay
-      // categorías para el eje X) y el usuario sabe qué hacer.
+      // sin datos se muestra un texto en vez del Chart
       chart: data.isEmpty
           ? const Center(child: Text('Elige al menos un tipo'))
           : Chart(
@@ -540,8 +449,6 @@ class _GraphicAdvanced14State extends State<GraphicAdvanced14> {
                 IntervalMark(
                   color: typeColorFixed(),
                   transition: Transition(duration: const Duration(milliseconds: 500)),
-                  // Como A09, pero las barras nuevas además aparecen desde
-                  // transparente (opacity) mientras crecen (y).
                   entrance: {MarkEntrance.y, MarkEntrance.opacity},
                   tag: (t) => t['name'] as String,
                 ),
@@ -565,21 +472,18 @@ class _GraphicAdvanced15State extends State<GraphicAdvanced15> {
 
   @override
   Widget build(BuildContext context) {
-    // Nombre de la variable que irá al eje Y según el modo.
     final y = _percent ? 'percent' : 'value';
     return GraphicChartCard(
       code: 'A15',
       title: 'Composición: absoluto o 100 %',
       description: 'Proportion(nest: Varset(name)) transforma cada columna a 100 %.',
       height: 280,
-      // _Choice con opciones bool: false = Absoluto, true = 100 %.
       controls: _Choice<bool>(
         options: const [false, true],
         selected: _percent,
         label: (p) => p ? '100 %' : 'Absoluto',
         onSelected: (p) => setState(() => _percent = p),
       ),
-      // Base: el apilado de N05.
       chart: Chart(
         data: statsLong(topBy((p) => p.total, 7)),
         variables: {
@@ -588,15 +492,11 @@ class _GraphicAdvanced15State extends State<GraphicAdvanced15> {
           'value': numVar('value', scale: LinearScale(min: 0, max: 700)),
         },
         transforms: [
-          // Lo nuevo aquí: Proportion con `nest`. En N28 el porcentaje era
-          // sobre el total de TODAS las filas; con nest: Varset('name') se
-          // calcula DENTRO de cada Pokémon: cada stat / total de ese
-          // Pokémon. Así cada columna apilada suma exactamente 1 (100 %).
+          // nest: el 100 % es por cada Pokémon
           Proportion(
             variable: 'value',
             nest: Varset('name'),
             as: 'percent',
-            // Escala 0 a 1; `formatter` muestra 0.25 como "25%" en el eje.
             scale: LinearScale(
               min: 0,
               max: 1,
@@ -606,8 +506,7 @@ class _GraphicAdvanced15State extends State<GraphicAdvanced15> {
         ],
         marks: [
           IntervalMark(
-            // Las dos variables existen siempre; solo cambia cuál va al
-            // eje Y (`y`). La transición anima el paso de una a otra.
+            // solo cambia la variable del eje Y
             position: Varset('name') * Varset(y) / Varset('stat'),
             color: ColorEncode(variable: 'stat', values: kStatColors),
             modifiers: [StackModifier()],
