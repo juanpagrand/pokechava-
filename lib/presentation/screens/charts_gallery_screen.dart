@@ -44,7 +44,7 @@ class ChartsGalleryScreen extends StatelessWidget {
             // categoría y la lista de tarjetas. Puede ser `const` porque no
             // recibe parámetros.
             GraphicChartsView(),
-            // Pestaña 3: 65 gráficas hechas con community_charts_flutter (Carlos)
+            // Pestaña de community_charts (Carlos)
             CommunityChartsView(),
             _ChartsListView(
               charts: [

@@ -1,20 +1,4 @@
-// ===========================================================================
-// community_advanced_interaction_charts.dart — AVANZADOS A01–A08
-// ===========================================================================
-// La interacción en community_charts se agrega con BEHAVIORS: objetos que se
-// pasan en `behaviors: [...]` y le enseñan algo nuevo al gráfico (resaltar,
-// mover, hacer zoom, mostrar una regla…). Para ENTERARSE desde Flutter de lo
-// que el usuario tocó se usa `selectionModels` con un listener.
-//
-//   A01 SelectNearest + LinePointHighlighter (regla que sigue el dedo)
-//   A02 InitialSelection (algo ya seleccionado al abrir)
-//   A03 SelectionModelConfig + changedListener → texto debajo del gráfico
-//   A04 PanAndZoomBehavior (pellizcar y arrastrar)
-//   A05 viewport inicial: ver solo 6 de 23 y desplazarse
-//   A06 SlidingViewport: al tocar, la vista se centra en lo tocado
-//   A07 Slider: un control deslizante dentro del gráfico
-//   A08 DomainHighlighter: resalta la barra seleccionada
-// ===========================================================================
+// Avanzados A01–A08: interacción (behaviors).
 
 import 'dart:math' as math;
 
@@ -46,14 +30,13 @@ class CommunityAdvanced01 extends StatelessWidget {
         ],
         animate: true,
         behaviors: [
-          // Dibuja una línea vertical y agranda los puntos seleccionados.
           charts.LinePointHighlighter(
             showHorizontalFollowLine:
                 charts.LinePointHighlighterFollowLineType.none,
             showVerticalFollowLine:
                 charts.LinePointHighlighterFollowLineType.nearest,
           ),
-          // Selecciona el dato más cercano al tocar Y al arrastrar.
+          // tapAndDrag: también al arrastrar
           charts.SelectNearest(
               eventTrigger: charts.SelectionTrigger.tapAndDrag),
         ],
@@ -81,11 +64,10 @@ class CommunityAdvanced02 extends StatelessWidget {
               color: Colors.indigo),
         ],
         animate: true,
-        // La interacción por defecto ya resalta lo que tocas.
         defaultInteractions: true,
         behaviors: [
           charts.InitialSelection(selectedDataConfig: [
-            // (id de la serie, valor del dominio)
+            // (serie, dominio)
             charts.SeriesDatumConfig<String>('Total', 'Mewtwo'),
           ]),
         ],
@@ -107,11 +89,10 @@ class CommunityAdvanced03 extends StatefulWidget {
 class _CommunityAdvanced03State extends State<CommunityAdvanced03> {
   String _detalle = 'Toca un punto de la línea.';
 
-  // La librería llama a esta función cada vez que cambia la selección.
+  // se llama cada vez que cambia la selección
   void _onSelectionChanged(charts.SelectionModel<DateTime> model) {
     final selected = model.selectedDatum;
     if (selected.isEmpty) return;
-    // selectedDatum: lista de (serie, dato). Aquí el dato es una generación.
     final g = selected.first.datum as CcGeneration;
     setState(() {
       _detalle = 'Generación ${g.number} · ${g.games} · '
@@ -146,7 +127,7 @@ class _CommunityAdvanced03State extends State<CommunityAdvanced03> {
   }
 }
 
-/// 120 turnos de combate simulados (deterministas) para el zoom.
+/// Turnos inventados para probar el zoom.
 final List<Point<int>> _turns = [
   for (var i = 1; i <= 120; i++)
     math.Point(
@@ -157,7 +138,7 @@ final List<Point<int>> _turns = [
     ),
 ];
 
-// `Point` sin prefijo: viene de dart:math (alias corto para el tipo).
+// para no escribir math.Point
 typedef Point<T extends num> = math.Point<T>;
 
 /// A04: zoom y desplazamiento.
@@ -204,7 +185,7 @@ class CommunityAdvanced05 extends StatelessWidget {
         animate: true,
         behaviors: [charts.PanAndZoomBehavior()],
         domainAxis: charts.OrdinalAxisSpec(
-          // Al abrir se ven 6 barras empezando por Bulbasaur.
+          // arranca mostrando 6 barras
           viewport: charts.OrdinalViewport('Bulbasaur', 6),
           renderSpec: charts.SmallTickRendererSpec(labelStyle: ccLabelStyle()),
         ),
@@ -251,8 +232,7 @@ class _CommunityAdvanced07State extends State<CommunityAdvanced07> {
 
   void _onSlider(math.Point<int> point, dynamic domain, String roleId,
       charts.SliderListenerDragState dragState) {
-    // El callback llega DURANTE el dibujo del gráfico; llamar setState ahí
-    // está prohibido. Por eso se agenda para después del fotograma.
+    // llega mientras se dibuja: setState después del frame
     SchedulerBinding.instance.addPostFrameCallback((_) {
       if (mounted) setState(() => _gen = (domain as num).round());
     });

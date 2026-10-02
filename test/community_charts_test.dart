@@ -1,6 +1,4 @@
-// Prueba de los 65 gráficos de community_charts_flutter (rama Carlos).
-// Comprueba que hay 40 + 25, numerados sin saltos, y que cada uno se dibuja
-// sin lanzar errores. No juzga el diseño: eso se revisa mirándolos.
+// Test de los 65 gráficos: cuántos son, el orden y que dibujen sin errores.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -43,13 +41,13 @@ void main() {
           ),
         ),
       ));
-      // Deja correr la animación de entrada.
+      // deja terminar la animación
       await tester.pump(const Duration(seconds: 2));
 
       expect(tester.takeException(), isNull);
       expect(find.byType(CommunityChartCard), findsOneWidget);
 
-      // Desmonta para cancelar timers (el A22 simula datos en vivo).
+      // desmontar para cancelar el Timer del A22
       await tester.pumpWidget(const SizedBox());
       await tester.pump(const Duration(seconds: 1));
     });

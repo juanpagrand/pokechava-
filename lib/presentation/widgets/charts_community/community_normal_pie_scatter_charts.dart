@@ -1,12 +1,4 @@
-// ===========================================================================
-// community_normal_pie_scatter_charts.dart — NORMALES N19–N29
-// ===========================================================================
-//   N19–N24 tortas: charts.PieChart. Cada DATO es una tajada; el dominio es
-//           su nombre y la medida su tamaño. La forma (dona, media torta,
-//           medidor) se decide en ArcRendererConfig.
-//   N25–N29 dispersión: charts.ScatterPlotChart. Dominio Y medida numéricos:
-//           cada dato es un punto (x, y). radiusPxFn da el tamaño.
-// ===========================================================================
+// Normales N19–N24 (tortas) y N25–N29 (dispersión).
 
 import 'dart:math' as math;
 
@@ -17,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'community_chart_card.dart';
 import 'community_data.dart';
 
-/// La serie de los tipos de Kanto: una tajada por tipo.
+/// Una tajada por tipo de Kanto.
 charts.Series<CcSlice, String> ccTypeSlices({bool withLabels = false}) {
   return charts.Series<CcSlice, String>(
     id: 'Tipos de Kanto',
@@ -39,7 +31,6 @@ class CommunityNormal19 extends StatelessWidget {
       code: 'N19',
       title: 'Tipos de Kanto (torta)',
       description: 'charts.PieChart: cada dato es una tajada.',
-      // PieChart<String>: el tipo es el del dominio (el nombre del tipo).
       chart: charts.PieChart<String>([ccTypeSlices()], animate: true),
     );
   }
@@ -135,7 +126,7 @@ class CommunityNormal23 extends StatelessWidget {
         [
           charts.Series<int, String>(
             id: 'Mewtwo',
-            // Los datos son los índices 0…5; con ellos se busca nombre y valor.
+            // los datos son los índices 0..5
             data: List.generate(6, (i) => i),
             domainFn: (i, _) => kCcStatNames[i],
             measureFn: (i, _) => p.stats[i],
@@ -186,7 +177,7 @@ class CommunityNormal24 extends StatelessWidget {
   }
 }
 
-/// Serie de dispersión con dos medidas numéricas de cada Pokémon.
+/// Serie de dispersión: x e y numéricos.
 charts.Series<CcPoke, num> ccScatter(
   String id,
   num Function(CcPoke) x,
@@ -239,7 +230,7 @@ class CommunityNormal26 extends StatelessWidget {
       chart: charts.ScatterPlotChart(
         [
           ccScatter('Pokémon', (p) => p.attack, (p) => p.defense,
-              // 340 de experiencia ≈ 12 px de radio.
+              // radio según la experiencia
               radius: (p) => 3 + p.baseExp / 40),
         ],
         animate: true,

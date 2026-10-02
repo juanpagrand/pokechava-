@@ -1,14 +1,4 @@
-// ===========================================================================
-// community_normal_time_combo_charts.dart — NORMALES N30–N40
-// ===========================================================================
-//   N30–N34 series de tiempo: charts.TimeSeriesChart. El dominio es
-//           DateTime; la librería arma sola un eje de fechas.
-//   N35–N36 combinados: OrdinalComboChart / NumericComboChart mezclan
-//           renderizadores (barras + línea, línea + puntos). Cada serie
-//           elige el suyo con setAttribute(charts.rendererIdKey, 'id').
-//   N37–N40 ejes: eje secundario, eje invertido, marcas fijas y gráfico sin
-//           ejes (sparkline).
-// ===========================================================================
+// Normales N30–N34 (tiempo), N35–N36 (combinados) y N37–N40 (ejes).
 
 import 'package:community_charts_flutter/community_charts_flutter.dart'
     as charts;
@@ -18,7 +8,7 @@ import 'community_chart_card.dart';
 import 'community_data.dart';
 import 'community_normal_bar_charts.dart' show ccPokeSeries;
 
-/// Serie de tiempo: fecha de cada generación → lo que diga `measure`.
+/// Serie de tiempo con la fecha de cada generación.
 charts.Series<CcGeneration, DateTime> ccTimeSeries(
   String id,
   num Function(CcGeneration g, int index) measure, {
@@ -47,7 +37,6 @@ class CommunityNormal30 extends StatelessWidget {
       chart: charts.TimeSeriesChart(
         [ccTimeSeries('Total', (_, i) => cumulative[i])],
         animate: true,
-        // LocalDateTimeFactory: las fechas se leen en hora local.
         dateTimeFactory: const charts.LocalDateTimeFactory(),
         domainAxis: ccDateAxis(),
         primaryMeasureAxis: ccNumericAxis(),
@@ -165,15 +154,12 @@ class CommunityNormal35 extends StatelessWidget {
       chart: charts.OrdinalComboChart(
         [
           ccPokeSeries('Ataque', pokes, (p) => p.attack, color: Colors.red),
-          // `..setAttribute` (notación cascada) modifica la serie recién
-          // creada: le dice que la dibuje el renderer con id 'linea'.
+          // la serie usa el renderer de línea
           ccPokeSeries('Defensa', pokes, (p) => p.defense, color: Colors.blue)
             ..setAttribute(charts.rendererIdKey, 'linea'),
         ],
         animate: true,
-        // Por defecto, barras…
         defaultRenderer: charts.BarRendererConfig(),
-        // …y un renderer extra con id 'linea' para quien lo pida.
         customSeriesRenderers: [
           charts.LineRendererConfig(customRendererId: 'linea'),
         ],
@@ -207,6 +193,7 @@ class CommunityNormal36 extends StatelessWidget {
       chart: charts.NumericComboChart(
         [
           gen('Acumulado ÷ 10', (_, i) => cumulative[i] / 10, Colors.indigo),
+          // esta va con el renderer de puntos
           gen('Nuevos', (g, _) => g.newPokemon, Colors.pink)
             ..setAttribute(charts.rendererIdKey, 'puntos'),
         ],
@@ -239,7 +226,7 @@ class CommunityNormal37 extends StatelessWidget {
               color: Colors.blueGrey),
           ccPokeSeries('Altura (m)', pokes, (p) => p.height,
               color: Colors.deepOrange)
-            // Esta serie se mide contra el eje de la derecha.
+            // eje derecho
             ..setAttribute(charts.measureAxisIdKey, 'secondaryMeasureAxisId'),
         ],
         animate: true,
@@ -254,9 +241,7 @@ class CommunityNormal37 extends StatelessWidget {
 }
 
 /// N38: eje con unidad y cuadrícula punteada.
-// Nota: la primera versión usaba `flipVerticalAxis: true` (barras colgando),
-// pero en community_charts_flutter 1.0.4 con Flutter 3.47 el gráfico sale
-// vacío. Se reemplazó por esta otra personalización de ejes.
+// con flipVerticalAxis salía vacío en esta versión, por eso se cambió
 class CommunityNormal38 extends StatelessWidget {
   const CommunityNormal38({super.key});
 
@@ -275,12 +260,10 @@ class CommunityNormal38 extends StatelessWidget {
         animate: true,
         domainAxis: ccOrdinalAxis(labelRotation: 45),
         primaryMeasureAxis: charts.NumericAxisSpec(
-          // El formateador recibe cada valor del eje y devuelve su texto.
           tickFormatterSpec: charts.BasicNumericTickFormatterSpec(
               (num? v) => v == null ? '' : '${v.round()} kg'),
           renderSpec: charts.GridlineRendererSpec(
             labelStyle: ccLabelStyle(),
-            // [4, 4]: 4 px de línea, 4 px de hueco.
             lineStyle: charts.LineStyleSpec(color: ccGridGray, dashPattern: [4, 4]),
           ),
         ),
@@ -296,7 +279,7 @@ class CommunityNormal39 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pokes = ccByNames(['Bulbasaur', 'Charmander', 'Squirtle', 'Pikachu']);
-    // TickSpec: valor + etiqueta + estilo propio. Pikachu se resalta.
+    // marcas a mano, Pikachu resaltado
     final ticks = <charts.TickSpec<String>>[
       for (final p in pokes)
         charts.TickSpec(

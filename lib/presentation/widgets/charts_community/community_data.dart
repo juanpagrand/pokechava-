@@ -1,25 +1,7 @@
-// ===========================================================================
-// community_data.dart — DATOS Y ATAJOS DE LOS GRÁFICOS DE community_charts
-// ===========================================================================
-// Qué contiene:
-//   - CcPoke: estadísticas base reales (PokeAPI) de 23 Pokémon.
-//   - kCcGenerations: Pokémon nuevos por generación y fecha de lanzamiento
-//     del primer juego de cada una (datos reales, para las series de tiempo).
-//   - kCcKantoTypes: tipos primarios de los 151 de Kanto (el mismo dato del
-//     informe del taller).
-//   - Atajos de color y de ejes para que los 65 gráficos se lean igual en
-//     tema claro y oscuro.
-//
-// Por qué los nombres llevan "Cc": la galería también carga fl_chart,
-// Syncfusion y graphic. El prefijo evita choques de nombres si algún día
-// alguien importa dos carpetas a la vez.
-//
-// Import con alias: `as charts`. community_charts_flutter exporta nombres
-// muy comunes (BarChart, LineChart, Color, Series…) que chocarían con los de
-// Flutter y con los de fl_chart. Con el alias, todo lo de la librería se
-// escribe `charts.Algo` y nunca hay ambigüedad.
-// ===========================================================================
+// Datos de Pokémon y atajos que usan todos los gráficos.
+// Prefijo Cc para no chocar con nombres de las otras librerías.
 
+// alias charts: la librería choca con nombres de Flutter (Color, BarChart...)
 import 'package:community_charts_flutter/community_charts_flutter.dart'
     as charts;
 import 'package:flutter/material.dart';
@@ -83,8 +65,7 @@ const List<String> kCcStatNames = [
   'Velocidad',
 ];
 
-/// Una generación: su número, cuántos Pokémon nuevos trajo y cuándo salió
-/// su primer juego en Japón.
+/// Generación: Pokémon nuevos y fecha del primer juego.
 class CcGeneration {
   final int number;
   final String games;
@@ -94,7 +75,7 @@ class CcGeneration {
   const CcGeneration(this.number, this.games, this.release, this.newPokemon);
 }
 
-// No puede ser `const`: DateTime no tiene constructor const.
+// no es const por los DateTime
 final List<CcGeneration> kCcGenerations = [
   CcGeneration(1, 'Rojo/Verde', DateTime(1996, 2, 27), 151),
   CcGeneration(2, 'Oro/Plata', DateTime(1999, 11, 21), 100),
@@ -107,7 +88,7 @@ final List<CcGeneration> kCcGenerations = [
   CcGeneration(9, 'Escarlata/Púrpura', DateTime(2022, 11, 18), 120),
 ];
 
-/// Total acumulado de la Pokédex después de cada generación (151 … 1025).
+/// Pokédex acumulada por generación (151 … 1025).
 List<int> get kCcCumulative {
   var sum = 0;
   return [for (final g in kCcGenerations) sum += g.newPokemon];
@@ -164,29 +145,20 @@ List<CcPoke> ccTopBy(num Function(CcPoke) value, int n) {
   return sorted.take(n).toList();
 }
 
-// ---------------------------------------------------------------------------
-// Colores: community_charts usa su PROPIA clase de color (charts.Color), no
-// la de Flutter. ColorUtil.fromDartColor convierte un Color de Flutter.
-// ---------------------------------------------------------------------------
-
+// la librería usa su propio Color, hay que convertir el de Flutter
 charts.Color ccColor(Color c) => charts.ColorUtil.fromDartColor(c);
 
 charts.Color ccTypeColor(String type) =>
     ccColor(kCcTypeColors[type] ?? Colors.grey);
 
-// ---------------------------------------------------------------------------
-// Ejes legibles en claro y oscuro. Por defecto la librería pinta el texto de
-// los ejes en negro, que desaparece sobre la tarjeta oscura: aquí se usa gris
-// medio, que se lee en los dos temas.
-// ---------------------------------------------------------------------------
-
+// gris para que los ejes se vean también en modo oscuro
 final charts.Color ccAxisGray = ccColor(const Color(0xFF8A8A8A));
 final charts.Color ccGridGray = ccColor(const Color(0x33888888));
 
 charts.TextStyleSpec ccLabelStyle({int fontSize = 10}) =>
     charts.TextStyleSpec(fontSize: fontSize, color: ccAxisGray);
 
-/// Eje de categorías (nombres de Pokémon) con texto gris.
+/// Eje de categorías.
 charts.OrdinalAxisSpec ccOrdinalAxis({int labelRotation = 0}) =>
     charts.OrdinalAxisSpec(
       renderSpec: charts.SmallTickRendererSpec(
@@ -213,7 +185,7 @@ charts.NumericAxisSpec ccNumericAxis({
       ),
     );
 
-/// Eje de fechas con texto gris.
+/// Eje de fechas.
 charts.DateTimeAxisSpec ccDateAxis() => charts.DateTimeAxisSpec(
       renderSpec: charts.SmallTickRendererSpec(
         labelStyle: ccLabelStyle(),
@@ -221,36 +193,25 @@ charts.DateTimeAxisSpec ccDateAxis() => charts.DateTimeAxisSpec(
       ),
     );
 
-/// Texto de leyendas legible en los dos temas.
+/// Texto de las leyendas.
 charts.TextStyleSpec ccLegendStyle() =>
     charts.TextStyleSpec(fontSize: 11, color: ccAxisGray);
 
-// ---------------------------------------------------------------------------
-// Puntos sobre una línea.
-//
-// OJO, defecto real de la librería: con community_charts_flutter 1.0.4 y
-// Flutter 3.47, `LineRendererConfig(includePoints: true)` dibuja los puntos
-// como rayitas pegadas al borde superior, no sobre la línea (se comprobó con
-// y sin animación). PointRendererConfig sí los dibuja bien, así que los
-// puntos se agregan como una SEGUNDA serie, igual a la primera, que dibuja
-// ese renderer.
-// ---------------------------------------------------------------------------
-
+// includePoints dibuja mal los puntos en esta versión, por eso va como serie aparte
 const String ccPointsRendererId = 'puntos';
 
-/// Copia de `s` que se dibuja con el renderer de puntos.
+/// Copia de la serie para dibujarla como puntos.
 charts.Series<T, D> ccPointsOf<T, D>(charts.Series<T, D> s) {
   return charts.Series<T, D>(
     id: '${s.id} · puntos',
     data: s.data,
-    // Dentro de una Series las funciones ya están "envueltas": reciben solo
-    // el índice del dato (AccessorFn). Por eso se llaman con `i`.
+    // aquí las funciones solo reciben el índice
     domainFn: (_, int? i) => s.domainFn(i),
     measureFn: (_, int? i) => s.measureFn(i),
     colorFn: s.colorFn == null ? null : (_, int? i) => s.colorFn!(i),
   )..setAttribute(charts.rendererIdKey, ccPointsRendererId);
 }
 
-/// El renderer que dibuja las series creadas con [ccPointsOf].
+/// Renderer para las series de ccPointsOf.
 charts.PointRendererConfig<D> ccPointRenderer<D>() =>
     charts.PointRendererConfig<D>(customRendererId: ccPointsRendererId);

@@ -1,15 +1,5 @@
-// ===========================================================================
-// community_normal_line_charts.dart — NORMALES N11–N18: LÍNEAS Y ÁREAS
-// ===========================================================================
-// charts.LineChart pide series cuyo DOMINIO sea numérico:
-// `charts.Series<T, num>`. Por eso aquí el eje X es la generación (1…9) o la
-// posición del Pokémon en la lista, nunca un nombre.
-//
-// Casi todo lo visual de una línea se decide en el RENDERIZADOR:
-//   charts.LineRendererConfig(includeArea:, stacked:, …)
-// y lo que cambia dato por dato, en la SERIE (colorFn, dashPatternFn,
-// strokeWidthPxFn, areaColorFn).
-// ===========================================================================
+// Normales N11–N18: líneas y áreas.
+// LineChart necesita dominio numérico (num), no nombres.
 
 import 'package:community_charts_flutter/community_charts_flutter.dart'
     as charts;
@@ -18,8 +8,7 @@ import 'package:flutter/material.dart';
 import 'community_chart_card.dart';
 import 'community_data.dart';
 
-/// Serie de generaciones: eje X = número de generación, eje Y = lo que diga
-/// `measure`.
+/// Serie por generación (x = número de generación).
 charts.Series<CcGeneration, num> ccGenSeries(
   String id,
   num Function(CcGeneration g, int index) measure, {
@@ -29,13 +18,13 @@ charts.Series<CcGeneration, num> ccGenSeries(
     id: id,
     data: kCcGenerations,
     domainFn: (CcGeneration g, _) => g.number,
-    // Aquí sí se usa el índice: el acumulado necesita saber la posición.
+    // el índice sirve para el acumulado
     measureFn: (CcGeneration g, int? i) => measure(g, i ?? 0),
     colorFn: (_, _) => ccColor(color),
   );
 }
 
-/// Serie de una estadística a lo largo de los 23 Pokémon (eje X = posición).
+/// Una estadística de los 23 (x = posición en la lista).
 charts.Series<CcPoke, num> ccIndexSeries(
     String id, int Function(CcPoke) measure, Color color) {
   return charts.Series<CcPoke, num>(
@@ -83,8 +72,7 @@ class CommunityNormal12 extends StatelessWidget {
       chart: charts.LineChart(
         [
           total,
-          // Ver ccPointsOf en community_data.dart: includePoints de esta
-          // versión de la librería pinta los puntos fuera de lugar.
+          // puntos aparte, ver ccPointsOf
           ccPointsOf(total),
         ],
         animate: true,
@@ -102,7 +90,6 @@ class CommunityNormal13 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Una serie por línea evolutiva; el eje X es la etapa (1, 2, 3).
     charts.Series<CcPoke, num> line(String id, List<String> names, Color c,
             List<int>? dash) =>
         charts.Series<CcPoke, num>(
@@ -111,7 +98,7 @@ class CommunityNormal13 extends StatelessWidget {
           domainFn: (_, int? i) => (i ?? 0) + 1,
           measureFn: (p, _) => p.total,
           colorFn: (_, _) => ccColor(c),
-          // Patrón de guiones: [largo del trazo, largo del hueco, …] en px.
+          // [trazo, hueco] en px
           dashPatternFn: dash == null ? null : (_, _) => dash,
         );
     return CommunityChartCard(
@@ -129,8 +116,7 @@ class CommunityNormal13 extends StatelessWidget {
         ],
         animate: true,
         domainAxis: ccNumericAxis(desiredTickCount: 3),
-        // zeroBound: false → el eje no tiene que empezar en cero; así se ven
-        // las diferencias entre 309 y 318.
+        // zeroBound: false para que no arranque en 0
         primaryMeasureAxis: charts.NumericAxisSpec(
           tickProviderSpec:
               const charts.BasicNumericTickProviderSpec(zeroBound: false),
@@ -209,7 +195,6 @@ class CommunityNormal16 extends StatelessWidget {
             domainFn: (_, int? i) => i ?? 0,
             measureFn: (p, _) => p.spAtk,
             colorFn: (_, _) => ccColor(Colors.deepPurple),
-            // `.lighter` aclara un color de la paleta de la librería.
             areaColorFn: (_, _) =>
                 charts.MaterialPalette.purple.shadeDefault.lighter,
           ),
@@ -229,8 +214,7 @@ class CommunityNormal17 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Consola de cada generación: Game Boy (1–2), GBA (3), DS (4–5),
-    // 3DS (6–7) y Switch (8–9).
+    // color según la consola de cada generación
     Color console(int gen) => switch (gen) {
           <= 2 => Colors.green,
           3 => Colors.indigo,
@@ -275,7 +259,6 @@ class CommunityNormal18 extends StatelessWidget {
           domainFn: (_, int? i) => i ?? 0,
           measureFn: (p, _) => f(p),
           colorFn: (_, _) => ccColor(c),
-          // Grosor en píxeles: la serie importante más gruesa.
           strokeWidthPxFn: (_, _) => width,
         );
     return CommunityChartCard(

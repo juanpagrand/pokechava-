@@ -1,14 +1,4 @@
-// ===========================================================================
-// community_advanced_data_charts.dart — AVANZADOS A19–A25
-// ===========================================================================
-//   A19 PercentInjector: cada columna se convierte a 100 %
-//   A20 porcentaje por categoría (físico / especial)
-//   A21 datos que cambian con botones (setState + animate)
-//   A22 tiempo real con Timer
-//   A23 leyenda con un ícono propio (CustomSymbolRenderer)
-//   A24 etiquetas con estilo según el valor (dentro / fuera de la barra)
-//   A25 dispersión + línea de tendencia calculada en Dart
-// ===========================================================================
+// Avanzados A19–A25: porcentajes, datos que cambian y renderers propios.
 
 import 'dart:async';
 import 'dart:math' as math;
@@ -38,11 +28,10 @@ class CommunityAdvanced19 extends StatelessWidget {
         animate: true,
         barGroupingType: charts.BarGroupingType.stacked,
         behaviors: [
-          // domain = el 100 % es el total de cada Pokémon (cada columna).
+          // domain = cada columna suma 100 %
           charts.PercentInjector(
               totalType: charts.PercentInjectorTotalType.domain),
         ],
-        // Un eje que escribe 0 %…100 % en lugar de números.
         primaryMeasureAxis: charts.PercentAxisSpec(
           renderSpec: charts.GridlineRendererSpec(
             labelStyle: ccLabelStyle(),
@@ -110,7 +99,7 @@ class CommunityAdvanced21 extends StatefulWidget {
 }
 
 class _CommunityAdvanced21State extends State<CommunityAdvanced21> {
-  // Qué estadística se muestra: índice dentro de kCcStatNames.
+  // índice en kCcStatNames
   int _stat = 1;
 
   @override
@@ -172,7 +161,7 @@ class _CommunityAdvanced22State extends State<CommunityAdvanced22> {
     _start();
   }
 
-  // Jigglypuff recibe golpes y a veces se cura (datos simulados).
+  // un turno: daño al azar y a veces se cura
   void _step() {
     _tick++;
     _hp = (_hp - _random.nextInt(14) + (_tick % 8 == 0 ? 40 : 0)).clamp(0, 115);
@@ -183,14 +172,13 @@ class _CommunityAdvanced22State extends State<CommunityAdvanced22> {
 
   void _start() {
     _timer = Timer.periodic(const Duration(milliseconds: 800), (_) {
-      // mounted: si el widget ya no está en pantalla, no se llama setState.
       if (mounted) setState(_step);
     });
   }
 
   @override
   void dispose() {
-    // Sin esto el Timer seguiría corriendo después de salir de la pantalla.
+    // cancelar el Timer, si no sigue corriendo al salir
     _timer?.cancel();
     super.dispose();
   }
@@ -220,16 +208,14 @@ class _CommunityAdvanced22State extends State<CommunityAdvanced22> {
         [
           charts.Series<math.Point<int>, num>(
             id: 'HP',
-            // Copia de la lista: el gráfico compara la instancia para
-            // saber si cambió.
+            // copia para que el gráfico note el cambio
             data: List.of(_points),
             domainFn: (p, _) => p.x,
             measureFn: (p, _) => p.y,
             colorFn: (_, _) => ccColor(Colors.pink),
           ),
         ],
-        // animate: false. Con un punto nuevo cada 0,8 s, animar cada cambio
-        // hace que la línea "tiemble".
+        // sin animación, si no la línea tiembla
         animate: false,
         defaultRenderer: charts.LineRendererConfig(includeArea: true),
         domainAxis: charts.NumericAxisSpec(
@@ -243,7 +229,7 @@ class _CommunityAdvanced22State extends State<CommunityAdvanced22> {
   }
 }
 
-/// Símbolo de leyenda propio: un ícono de Flutter en vez del cuadrito.
+/// Ícono de Flutter como símbolo de la leyenda.
 class _IconSymbol extends charts.CustomSymbolRenderer {
   final IconData icon;
 
@@ -254,7 +240,6 @@ class _IconSymbol extends charts.CustomSymbolRenderer {
       {Size? size, Color? color, bool enabled = true}) {
     return SizedBox.fromSize(
       size: size,
-      // Si la serie está oculta (enabled = false), el ícono se ve tenue.
       child: Icon(icon,
           size: 12,
           color: enabled ? color : color?.withValues(alpha: 0.3)),
@@ -315,14 +300,12 @@ class CommunityAdvanced24 extends StatelessWidget {
             measureFn: (p, _) => p.defense,
             colorFn: (p, _) => ccTypeColor(p.type),
             labelAccessorFn: (p, _) => '${p.name}: ${p.defense}',
-            // Estilo cuando la etiqueta cabe DENTRO de la barra…
             insideLabelStyleAccessorFn: (p, _) => charts.TextStyleSpec(
               fontSize: 10,
               color: p.defense >= 100
                   ? ccColor(Colors.red.shade900)
                   : charts.MaterialPalette.white,
             ),
-            // …y cuando tiene que ir afuera.
             outsideLabelStyleAccessorFn: (p, _) => charts.TextStyleSpec(
               fontSize: 10,
               color: p.defense >= 100 ? ccColor(Colors.red) : ccAxisGray,
@@ -332,7 +315,7 @@ class CommunityAdvanced24 extends StatelessWidget {
         animate: true,
         vertical: false,
         barRendererDecorator: charts.BarLabelDecorator<String>(),
-        // Los nombres ya van en la etiqueta: se oculta el eje de nombres.
+        // los nombres ya van en la etiqueta
         domainAxis:
             const charts.OrdinalAxisSpec(renderSpec: charts.NoneRenderSpec()),
         primaryMeasureAxis: ccNumericAxis(),
@@ -347,7 +330,7 @@ class CommunityAdvanced25 extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Recta de mínimos cuadrados: peso ≈ a + b · altura.
+    // mínimos cuadrados: peso = a + b·altura
     final xs = kCcPokes.map((p) => p.height).toList();
     final ys = kCcPokes.map((p) => p.weight).toList();
     final n = xs.length;
@@ -394,7 +377,7 @@ class CommunityAdvanced25 extends StatelessWidget {
         customSeriesRenderers: [
           charts.LineRendererConfig(
             customRendererId: 'tendencia',
-            // Se pinta después de los puntos, encima de ellos.
+            // encima de los puntos
             layoutPaintOrder: charts.LayoutViewPaintOrder.point + 1,
           ),
         ],

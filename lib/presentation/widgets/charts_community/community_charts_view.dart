@@ -1,15 +1,4 @@
-// ===========================================================================
-// community_charts_view.dart — LA PESTAÑA "community_charts (40 + 25)"
-// ===========================================================================
-// Lista los 65 gráficos con dos filtros: nivel (Normales / Avanzados) y
-// categoría. Misma estructura que graphic_charts_view.dart:
-//   - Cada categoría guarda FUNCIONES que crean el gráfico
-//     (`Widget Function()`), no el widget ya creado. ListView.separated solo
-//     llama a las que están en pantalla: el gráfico 60 no se construye hasta
-//     que llegas a él.
-//   - communityChartBuilders() expone la lista en orden para la prueba de
-//     test/community_charts_test.dart.
-// ===========================================================================
+// Pestaña con los 65 gráficos, filtro por nivel y categoría.
 
 import 'package:flutter/material.dart';
 
@@ -23,6 +12,7 @@ class _Category {
   const _Category(this.name, this.advanced, this.charts);
 }
 
+// Funciones y no widgets: solo se construye lo que se ve.
 final List<_Category> _categories = [
   _Category('Barras', false, [
     () => const CommunityNormal01(),
@@ -109,13 +99,13 @@ final List<_Category> _categories = [
   ]),
 ];
 
-/// Todos los gráficos en orden (N01…N40, A01…A25), para pruebas y conteos.
+/// Todos en orden (N01…A25). Lo usa el test.
 List<Widget Function()> communityChartBuilders({bool? advanced}) => [
       for (final c in _categories)
         if (advanced == null || c.advanced == advanced) ...c.charts,
     ];
 
-/// Vista de los 65 gráficos de community_charts, filtrable.
+/// Pestaña de community_charts.
 class CommunityChartsView extends StatefulWidget {
   const CommunityChartsView({super.key});
 

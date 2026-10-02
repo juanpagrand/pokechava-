@@ -1,15 +1,5 @@
-// ===========================================================================
-// community_chart_card.dart — LA TARJETA QUE ENVUELVE CADA GRÁFICO
-// ===========================================================================
-// Un widget de Flutter puro (no usa community_charts): da a los 65 gráficos
-// el mismo marco. Código (N01…/A01…), título, descripción, controles
-// opcionales y una caja de ALTO FIJO donde va el gráfico.
-//
-// Por qué el alto fijo: los gráficos de community_charts ocupan todo el
-// espacio que les dan. Dentro de un ListView el alto no tiene límite, así
-// que sin este SizedBox el gráfico no sabría cuánto medir y Flutter lanzaría
-// un error de altura sin límite.
-// ===========================================================================
+// Tarjeta común para los gráficos de community_charts.
+// Alto fijo porque dentro de un ListView el gráfico no sabe cuánto medir.
 
 import 'package:flutter/material.dart';
 
@@ -21,10 +11,10 @@ class CommunityChartCard extends StatelessWidget {
   final Widget chart;
   final double height;
 
-  /// Botones o selectores opcionales encima del gráfico.
+  /// Botones opcionales encima del gráfico.
   final Widget? controls;
 
-  /// Texto opcional debajo del gráfico (por ejemplo, lo que se seleccionó).
+  /// Texto opcional debajo del gráfico.
   final Widget? footer;
 
   const CommunityChartCard({
@@ -43,8 +33,7 @@ class CommunityChartCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    // Naranja para normales, índigo para avanzados: se distinguen de un
-    // vistazo de los de graphic (verde azulado y morado).
+    // naranja = normales, índigo = avanzados
     final badgeColor = isAdvanced ? Colors.indigo : Colors.deepOrange;
     return Card(
       elevation: 2,

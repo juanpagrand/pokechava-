@@ -1,26 +1,4 @@
-// ===========================================================================
-// charts_community.dart — ARCHIVO BARRIL de community_charts_flutter
-// ===========================================================================
-// No define nada: reexporta. Quien haga `import 'charts_community.dart';`
-// recibe los 65 gráficos (CommunityNormal01…40, CommunityAdvanced01…25), la
-// tarjeta y los datos. Es el mismo patrón que charts.dart (fl_chart),
-// charts_syncfusion.dart (Syncfusion) y charts_graphic.dart (graphic).
-//
-// Mapa de la carpeta lib/presentation/widgets/charts_community/:
-//   community_data.dart        → datos de Pokémon/generaciones y atajos
-//   community_chart_card.dart  → la tarjeta común
-//   community_normal_*.dart    → los 40 normales (N01–N40)
-//   community_advanced_*.dart  → los 25 avanzados (A01–A25)
-//   community_charts_view.dart → la pestaña que los lista y filtra
-//   charts_community.dart      → este barril
-//
-// Cadena hasta la pantalla:
-//   pubspec.yaml (community_charts_flutter: ^1.0.4) → cada archivo importa
-//   'package:community_charts_flutter/community_charts_flutter.dart' as
-//   charts → CommunityNormalXX → CommunityChartCard → CommunityChartsView →
-//   pestaña "community_charts (40 + 25)" de ChartsGalleryScreen → botón de
-//   gráficos del AppBar de HomeScreen.
-// ===========================================================================
+// Barril: exporta todo lo de community_charts.
 
 export 'community_chart_card.dart';
 export 'community_data.dart';

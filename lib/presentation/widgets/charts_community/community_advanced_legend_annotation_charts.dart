@@ -1,18 +1,4 @@
-// ===========================================================================
-// community_advanced_legend_annotation_charts.dart — AVANZADOS A09–A18
-// ===========================================================================
-// Leyendas, títulos y anotaciones también son BEHAVIORS:
-//   A09 SeriesLegend: tocar una entrada oculta/muestra esa serie
-//   A10 leyenda a la derecha, en dos filas
-//   A11 leyenda que muestra el valor seleccionado (showMeasures)
-//   A12 DatumLegend: leyenda de una torta (una entrada por tajada)
-//   A13 una serie oculta desde el inicio (defaultHiddenSeries)
-//   A14 ChartTitle en los cuatro lados
-//   A15 RangeAnnotation: franjas de rango sobre el gráfico
-//   A16 LineAnnotationSegment: línea de promedio con etiqueta
-//   A17 anotaciones en un eje de fechas
-//   A18 BarTargetLineRenderer: una "meta" dibujada sobre cada barra
-// ===========================================================================
+// Avanzados A09–A18: leyendas, títulos y anotaciones.
 
 import 'package:community_charts_flutter/community_charts_flutter.dart'
     as charts;
@@ -73,10 +59,8 @@ class CommunityAdvanced10 extends StatelessWidget {
         barGroupingType: charts.BarGroupingType.stacked,
         behaviors: [
           charts.SeriesLegend(
-            // end = a la derecha (en idiomas que se leen de izquierda a
-            // derecha).
+            // end = a la derecha
             position: charts.BehaviorPosition.end,
-            // Llena primero hacia abajo, en columnas.
             horizontalFirst: false,
             cellPadding: const EdgeInsets.only(right: 4, bottom: 4),
             entryTextStyle: ccLegendStyle(),
@@ -114,7 +98,6 @@ class CommunityAdvanced11 extends StatelessWidget {
             position: charts.BehaviorPosition.end,
             horizontalFirst: false,
             showMeasures: true,
-            // Cómo escribir el número; null cuando no hay selección.
             measureFormatter: (num? v) => v == null ? '–' : '$v',
             entryTextStyle: ccLegendStyle(),
           ),
@@ -146,7 +129,7 @@ class CommunityAdvanced12 extends StatelessWidget {
             position: charts.BehaviorPosition.end,
             horizontalFirst: false,
             showMeasures: true,
-            // Sin selección, muestra el valor de cada tajada.
+            // muestra el valor aunque no haya selección
             legendDefaultMeasure: charts.LegendDefaultMeasure.firstValue,
             measureFormatter: (num? v) => v == null ? '–' : '$v',
             entryTextStyle: ccLegendStyle(),
@@ -237,7 +220,7 @@ class CommunityAdvanced15 extends StatelessWidget {
         animate: true,
         behaviors: [
           charts.RangeAnnotation([
-            // (inicio, fin, eje) + etiquetas y color de la franja.
+            // (inicio, fin, eje)
             charts.RangeAnnotationSegment(
               120, 140, charts.RangeAnnotationAxisType.measure,
               startLabel: 'Élite ≥ 120',
@@ -340,6 +323,7 @@ class CommunityAdvanced18 extends StatelessWidget {
       chart: charts.BarChart(
         [
           ccPokeSeries('Ataque', pokes, (p) => p.attack, color: Colors.red),
+          // esta se dibuja como raya (renderer 'meta')
           ccPokeSeries('At. Esp. (meta)', pokes, (p) => p.spAtk,
               color: Colors.amber)
             ..setAttribute(charts.rendererIdKey, 'meta'),
