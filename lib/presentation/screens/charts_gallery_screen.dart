@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/charts/charts.dart';
 import '../widgets/charts_syncfusion/syncfusion_charts_view.dart';
+import '../widgets/charts_graphic/graphic_charts_view.dart';
 
 class ChartsGalleryScreen extends StatelessWidget {
   const ChartsGalleryScreen({super.key});
@@ -8,7 +9,7 @@ class ChartsGalleryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 6,
+      length: 7,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Galería de Gráficos'),
@@ -16,6 +17,7 @@ class ChartsGalleryScreen extends StatelessWidget {
             isScrollable: true,
             tabs: [
               Tab(icon: Icon(Icons.auto_graph_rounded), text: 'graficas hechas con synfusion'),
+              Tab(icon: Icon(Icons.hub_outlined), text: 'graphic (40 + 25)'),
               Tab(icon: Icon(Icons.bar_chart), text: 'Barras fl_chart (10)'),
               Tab(icon: Icon(Icons.show_chart), text: 'Líneas fl_chart (10)'),
               Tab(icon: Icon(Icons.pie_chart), text: 'Pastel fl_chart (10)'),
@@ -28,6 +30,8 @@ class ChartsGalleryScreen extends StatelessWidget {
           children: [
             // Tab 1: 40 Gráficas hechas con Syncfusion
             SyncfusionChartsView(),
+            // Tab 2: 65 gráficas hechas con graphic (Juan)
+            GraphicChartsView(),
             _ChartsListView(
               charts: [
                 BarChartWidget01(),

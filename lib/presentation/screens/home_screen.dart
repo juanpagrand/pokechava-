@@ -114,7 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
           // Charts Gallery Button
           IconButton(
-            tooltip: 'Gráficos (Syncfusion & fl_chart)',
+            tooltip: 'Gráficos (Syncfusion, fl_chart y graphic)',
             icon: const Icon(Icons.auto_graph_rounded),
             onPressed: () {
               Navigator.push(
