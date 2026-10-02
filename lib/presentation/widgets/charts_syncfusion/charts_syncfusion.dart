@@ -26,3 +26,10 @@ export 'syncfusion_box_charts.dart';
 
 // 8. Gráficos Combinados (36 al 40)
 export 'syncfusion_combo_charts.dart';
+
+// Tarjeta común
+export 'syncfusion_chart_card.dart';
+
+// 25 Gráficos Avanzados (A01 al A25)
+export 'syncfusion_advanced_charts.dart';
+

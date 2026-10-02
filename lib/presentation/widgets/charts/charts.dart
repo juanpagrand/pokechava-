@@ -49,3 +49,13 @@ export 'scatter/scatter_chart_02.dart';
 export 'scatter/scatter_chart_03.dart';
 export 'scatter/scatter_chart_04.dart';
 export 'scatter/scatter_chart_05.dart';
+
+// Tarjeta común fl_chart
+export 'fl_chart_card.dart';
+
+// 25 Gráficos Avanzados fl_chart (A01 al A25)
+export 'fl_advanced_charts.dart';
+
+// Vista integrada con Normales (40) y Avanzados (25)
+export 'fl_charts_view.dart';
+

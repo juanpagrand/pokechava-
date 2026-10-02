@@ -51,3 +51,51 @@ class HistogramChartData {
 
   const HistogramChartData(this.value);
 }
+
+/// Modelo para datos de burbuja tridimensional (X: altura/peso, Y: stat, Size: BST)
+class BubbleChartData {
+  final double x;
+  final double y;
+  final double size;
+  final String label;
+  final Color color;
+
+  const BubbleChartData(this.x, this.y, this.size, this.label, this.color);
+}
+
+/// Modelo para gráficos de embudo o pirámide
+class FunnelChartData {
+  final String stage;
+  final double value;
+  final Color color;
+
+  const FunnelChartData(this.stage, this.value, this.color);
+}
+
+/// Modelo para gráficos radiales / gauge
+class RadialGaugeData {
+  final String category;
+  final double value;
+  final String label;
+  final Color color;
+
+  const RadialGaugeData(this.category, this.value, this.label, this.color);
+}
+
+/// Modelo para gráficos de radar / polar
+class PolarStatData {
+  final String stat;
+  final double value;
+
+  const PolarStatData(this.stat, this.value);
+}
+
+/// Modelo para gráficos multieje o comparativos directos
+class DualAxisChartData {
+  final String x;
+  final double primary;
+  final double secondary;
+
+  const DualAxisChartData(this.x, this.primary, this.secondary);
+}
+

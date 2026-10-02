@@ -8,7 +8,7 @@ class SyncfusionChartsGalleryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Gráficas hechas con Syncfusion (40)'),
+        title: const Text('Gráficas hechas con Syncfusion (40 + 25)'),
         elevation: 1,
       ),
       body: const SyncfusionChartsView(),
