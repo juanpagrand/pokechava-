@@ -5,6 +5,7 @@ import '../widgets/charts_syncfusion/syncfusion_charts_view.dart';
 // por dentro el barril charts_graphic.dart con los 65 gráficos, así que
 // esta pantalla no necesita conocer cada gráfico por separado.
 import '../widgets/charts_graphic/graphic_charts_view.dart';
+import '../widgets/charts_community/community_charts_view.dart';
 
 class ChartsGalleryScreen extends StatelessWidget {
   const ChartsGalleryScreen({super.key});
@@ -12,7 +13,7 @@ class ChartsGalleryScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 7,
+      length: 8,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Galería de Gráficos'),
@@ -24,6 +25,7 @@ class ChartsGalleryScreen extends StatelessWidget {
               // + 25 avanzados). El orden de estas pestañas debe coincidir
               // con el orden de los hijos de TabBarView más abajo.
               Tab(icon: Icon(Icons.hub_outlined), text: 'graphic (40 + 25)'),
+              Tab(icon: Icon(Icons.stacked_bar_chart), text: 'community_charts (40 + 25)'),
               Tab(icon: Icon(Icons.bar_chart), text: 'Barras fl_chart (10)'),
               Tab(icon: Icon(Icons.show_chart), text: 'Líneas fl_chart (10)'),
               Tab(icon: Icon(Icons.pie_chart), text: 'Pastel fl_chart (10)'),
@@ -42,6 +44,8 @@ class ChartsGalleryScreen extends StatelessWidget {
             // categoría y la lista de tarjetas. Puede ser `const` porque no
             // recibe parámetros.
             GraphicChartsView(),
+            // Pestaña 3: 65 gráficas hechas con community_charts_flutter (Carlos)
+            CommunityChartsView(),
             _ChartsListView(
               charts: [
                 BarChartWidget01(),
