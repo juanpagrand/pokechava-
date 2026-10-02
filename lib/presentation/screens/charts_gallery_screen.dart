@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/charts/charts.dart';
 import '../widgets/charts_syncfusion/syncfusion_charts_view.dart';
-// graphic: se importa solo la vista (GraphicChartsView). Esa vista ya trae
-// por dentro el barril charts_graphic.dart con los 65 gráficos, así que
-// esta pantalla no necesita conocer cada gráfico por separado.
 import '../widgets/charts_graphic/graphic_charts_view.dart';
 
 class ChartsGalleryScreen extends StatelessWidget {
@@ -20,9 +17,6 @@ class ChartsGalleryScreen extends StatelessWidget {
             isScrollable: true,
             tabs: [
               Tab(icon: Icon(Icons.auto_graph_rounded), text: 'graficas hechas con synfusion'),
-              // Pestaña 2: los gráficos de la librería graphic (40 normales
-              // + 25 avanzados). El orden de estas pestañas debe coincidir
-              // con el orden de los hijos de TabBarView más abajo.
               Tab(icon: Icon(Icons.hub_outlined), text: 'graphic (40 + 25)'),
               Tab(icon: Icon(Icons.bar_chart), text: 'Barras fl_chart (10)'),
               Tab(icon: Icon(Icons.show_chart), text: 'Líneas fl_chart (10)'),
@@ -37,10 +31,6 @@ class ChartsGalleryScreen extends StatelessWidget {
             // Tab 1: 40 Gráficas hechas con Syncfusion
             SyncfusionChartsView(),
             // Tab 2: 65 gráficas hechas con graphic (Juan)
-            // GraphicChartsView (charts_graphic/graphic_charts_view.dart)
-            // trae su propio selector Normales/Avanzados, los chips de
-            // categoría y la lista de tarjetas. Puede ser `const` porque no
-            // recibe parámetros.
             GraphicChartsView(),
             _ChartsListView(
               charts: [
